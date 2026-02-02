@@ -21,6 +21,40 @@
             color: white;
             padding: 1rem;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        .header-left { flex: 1; }
+        .header-center { flex: 2; }
+        .header-right { flex: 1; text-align: right; }
+
+        /* Dark Mode Global Styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        body.dark-mode header {
+            background: #000000;
+        }
+
+        #theme-toggle {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        #theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        body.dark-mode #theme-toggle {
+            border-color: #FBBC04;
+            color: #FBBC04;
         }
         #map {
             flex-grow: 1;
@@ -53,7 +87,13 @@
 <body>
     <div id="app">
         <header>
-            <h1>Google Maps Dynamic Loader</h1>
+            <div class="header-left"></div>
+            <div class="header-center">
+                <h1>Google Maps Dynamic Loader</h1>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle">Modo Oscuro</button>
+            </div>
         </header>
         <div id="map">
             <div id="loader">Cargando Mapa...</div>
