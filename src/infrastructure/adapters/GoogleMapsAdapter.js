@@ -46,7 +46,11 @@ export class GoogleMapsAdapter {
                 center: this.config.defaultLocation,
                 zoom: 14,
                 mapId: this.config.mapId, // Necesario para Advanced Markers
-                mapTypeControl: false,
+                mapTypeControl: true,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                    position: google.maps.ControlPosition.TOP_LEFT,
+                },
             });
 
             this.logger.info("Mapa renderizado exitosamente.");
