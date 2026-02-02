@@ -44,6 +44,9 @@ docker-compose.override.yml
 .DS_Store
 Thumbs.db
 
+# Scripts de configuración local
+*.bat
+
 # Temporales / Otros
 *.zip
 *.tar.gz

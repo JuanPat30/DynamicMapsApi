@@ -1,33 +1,44 @@
 /**
  * Configuración centralizada de la aplicación.
- * Implementa validación básica para asegurar que las variables requeridas estén presentes.
+ * Prioriza valores inyectados en runtime para compatibilidad con contenedores (Cloud Run).
  */
 
-const getEnv = (key, defaultValue = undefined) => {
-    const value = import.meta.env[key] || defaultValue;
-    if (value === undefined) {
-        throw new Error(`MISSING_ENV_VAR: La variable de entorno ${key} es obligatoria.`);
+const getEnv = (key, placeholder) => {
+    // 1. Buscar en el objeto inyectado en runtime (index.html)
+    const runtimeConfig = window.APP_CONFIG || {};
+    const runtimeValue = runtimeConfig[key];
+
+    // Si el valor existe y no es el placeholder original del Dockerfile, lo usamos
+    if (runtimeValue && runtimeValue !== placeholder) {
+        return runtimeValue;
     }
-    return value;
+
+    // 2. Fallback a variables de compilacion de Vite (import.meta.env)
+    const viteKey = `VITE_GOOGLE_MAPS_${key}`; // Intento de mapeo automatico
+    const viteValue = import.meta.env[viteKey] || import.meta.env[`VITE_${key}`];
+
+    if (viteValue) return viteValue;
+
+    return undefined;
 };
 
 export const Config = {
-    apiKey: getEnv('VITE_GOOGLE_MAPS_API_KEY'),
-    mapId: getEnv('VITE_GOOGLE_MAPS_MAP_ID'),
+    apiKey: getEnv('API_KEY', '__VITE_GOOGLE_MAPS_API_KEY__'),
+    mapId: getEnv('MAP_ID', '__VITE_GOOGLE_MAPS_MAP_ID__'),
     defaultLocation: {
-        lat: parseFloat(getEnv('VITE_DEFAULT_LAT', '0')),
-        lng: parseFloat(getEnv('VITE_DEFAULT_LNG', '0')),
+        lat: parseFloat(getEnv('DEFAULT_LAT', '__VITE_DEFAULT_LAT__') || '40.7484'),
+        lng: parseFloat(getEnv('DEFAULT_LNG', '__VITE_DEFAULT_LNG__') || '-73.9857'),
     },
     app: {
-        env: getEnv('VITE_APP_ENV', 'development'),
-        isDev: getEnv('VITE_APP_ENV', 'development') === 'development',
+        env: getEnv('APP_ENV', '__VITE_APP_ENV__') || 'development',
+        isDev: (getEnv('APP_ENV', '__VITE_APP_ENV__') || 'development') === 'development',
     },
     gcp: {
         projectId: import.meta.env.GOOGLE_CLOUD_PROJECT || 'unknown',
     }
 };
 
-// Validación de tipos para coordenadas
-if (isNaN(Config.defaultLocation.lat) || isNaN(Config.defaultLocation.lng)) {
-    throw new Error("INVALID_CONFIG: Las coordenadas por defecto deben ser números válidos.");
+// Fail-fast profesional
+if (!Config.apiKey) {
+    throw new Error("MISSING_ENV_VAR: La variable de entorno VITE_GOOGLE_MAPS_API_KEY es obligatoria.");
 }

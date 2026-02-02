@@ -1,63 +1,46 @@
 # Google Maps Dynamic Loader - Hexagonal Architecture [Test Environment]
 
-Este proyecto es una implementación de referencia para la integración de **Google Maps JavaScript API** utilizando **Arquitectura Hexagonal (Ports & Adapters)**. Está diseñado para ser altamente modular, testeable y listo para despliegues modernos en la nube (Cloud Run).
+Este proyecto es una implementación de referencia para la integración de **Google Maps JavaScript API** utilizando capacidades modernas de mapas vectoriales y una arquitectura robusta lista para la nube.
 
 ## 🏛️ Arquitectura y Patrones de Diseño
 
-La solución sigue los principios de Clean Architecture para desacoplar la lógica de negocio de los detalles de infraestructura:
+La solución sigue los principios de **Clean Architecture** para desacoplar la lógica de negocio de los detalles de infraestructura:
 
--   **Core (Ports):** Define las interfaces abstractas (ej. `ILogger.js`). La aplicación interactúa con estas abstracciones, no con implementaciones concretas.
--   **Infrastructure (Adapters):** Contiene las implementaciones específicas.
-    -   `GoogleMapsAdapter`: Encapsula el SDK de Google, gestionando la carga dinámica y la renderización vectorial.
-    -   `ConsoleLoggerAdapter`: Implementación de logging para el entorno de consola.
--   **Configuración Fail-Fast:** El módulo `env.js` valida la presencia y el tipo de las variables de entorno críticas durante el arranque, evitando fallos silenciosos en producción.
--   **Dependency Injection (Bootstrap):** La clase `App` en `main.js` actúa como el orquestador y contenedor de dependencias, instanciando y vinculando los adaptadores.
+-   **Core (Ports):** Define las interfaces abstractas (ej. `ILogger.js`).
+-   **Infrastructure (Adapters):** Implementaciones concretas (ej. `GoogleMapsAdapter.js`).
+-   **Runtime Configuration Injection:** A diferencia de las apps estáticas tradicionales, este proyecto utiliza un sistema de inyección en tiempo de ejecución. Esto permite que las variables de entorno de Cloud Run afecten al mapa sin necesidad de re-compilar el código.
 
 ## 🚀 Características Técnicas Avanzadas
 
 ### 🗺️ Renderizado Vectorial y 3D
--   **Vector Maps:** Configurado para utilizar capacidades de renderizado vectorial mediante `Map ID`.
 -   **Perspectiva Avanzada:** Soporte nativo para **Tilt** (inclinación) y **Heading** (rotación).
--   **Visualización 3D:** Optimizado para el renderizado de edificios 3D en zonas de alta densidad (ej. Manhattan) mediante la gestión dinámica del nivel de zoom y propiedades de cámara.
+-   **Visualización 3D:** Optimizado para edificios 3D en zonas de alta densidad (ej. Manhattan).
+-   **Dynamic Loading:** Uso de `@googlemaps/js-api-loader` para optimizar la carga del SDK.
 
 ### 🐳 Docker & Cloud-Native (GCP Cloud Run)
--   **Puerto Dinámico:** Configuración de Nginx adaptada para Google Cloud Run. Utiliza `envsubst` en el `Dockerfile` para inyectar la variable de entorno `$PORT` en tiempo de ejecución.
--   **Application Default Credentials (ADC):** Soporte para entornos de desarrollo local mediante el montaje de volúmenes en `docker-compose.yml`, permitiendo que el contenedor utilice las credenciales de `gcloud` del host.
--   **Multi-stage Build:** Proceso de construcción optimizado para generar imágenes de producción ligeras basadas en Alpine Linux.
+-   **Despliegue Directo:** El script `deploy.bat` utiliza `gcloud run deploy --source`, automatizando la construcción y el despliegue en un solo paso.
+-   **Inyección de Secretos:** Integración nativa con **GCP Secret Manager** para inyectar la API Key y el Map ID de forma segura al arrancar el contenedor.
 
-### 🛠️ Frontend & DX
--   **Vite:** Tooling moderno para un desarrollo rápido y builds optimizados.
--   **Dynamic Loading:** Implementación de `@googlemaps/js-api-loader` para minimizar el bundle inicial y cargar el SDK de Maps solo cuando sea necesario.
--   **UX Robusta:** Incluye un loader visual y un sistema de manejo de errores fatales que informa al usuario final sobre problemas de configuración o conectividad.
+## 🛡️ Seguridad y Mejores Prácticas
+
+Aunque las API Keys de frontend son visibles en el navegador por diseño, se deben seguir estas prácticas de **Hardening**:
+
+1.  **Restricciones de HTTP Referrer:** En la Consola de GCP, configure la API Key para que solo acepte peticiones desde su dominio de Cloud Run (`*.run.app`).
+2.  **Restricciones de API:** Limite la llave únicamente a "Maps JavaScript API".
+3.  **Secret Manager:** Nunca guarde llaves en el código fuente. Este proyecto utiliza Secret Manager para todas las credenciales sensibles.
 
 ## ⚙️ Configuración del Entorno
 
-Copie el archivo de ejemplo y configure sus credenciales:
-
-```bash
-cp .env.example .env
-```
-
-| Variable | Descripción | Requerido |
+| Variable | Fuente Recomendada | Propósito |
 | :--- | :--- | :--- |
-| `VITE_GOOGLE_MAPS_API_KEY` | API Key con permisos para Maps JS API | Sí |
-| `VITE_GOOGLE_MAPS_MAP_ID` | ID de mapa configurado como Vectorial | Sí |
-| `GOOGLE_CLOUD_PROJECT` | ID del proyecto en GCP | Opcional |
-| `GOOGLE_APPLICATION_CREDENTIALS`| Ruta interna al JSON de credenciales | Opcional |
+| `VITE_GOOGLE_MAPS_API_KEY` | Secret Manager | Llave de acceso a Maps |
+| `VITE_GOOGLE_MAPS_MAP_ID` | Secret Manager | ID de Mapa Vectorial |
+| `VITE_APP_ENV` | Variable de Entorno | Entorno (production/development) |
 
-## 🛠️ Ejecución
+## 🛠️ Scripts de Automatización (Windows)
 
-### Desarrollo Local (Host)
-Requiere Node.js 20+.
-```bash
-npm install
-npm run dev
-```
-
-### Docker Compose (Entorno Local Controlado)
-```bash
-docker-compose up --build
-```
+-   `set-secrets.bat`: Sincroniza tu Map ID local desde `.env` hacia GCP Secret Manager.
+-   `deploy.bat`: Realiza el despliegue completo hacia Google Cloud Run.
 
 ---
-**Nota:** Este proyecto está marcado como **[Test Environment]** para propósitos de validación de API y pruebas de integración.
+**Nota:** Proyecto desarrollado como entorno de pruebas técnico para validación de capacidades 3D y arquitectura hexagonal.

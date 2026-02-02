@@ -71,6 +71,16 @@
     </style>
 </head>
 <body>
+    <script>
+        // Placeholder para inyección de variables de entorno en runtime
+        window.APP_CONFIG = {
+            API_KEY: "__VITE_GOOGLE_MAPS_API_KEY__",
+            MAP_ID: "__VITE_GOOGLE_MAPS_MAP_ID__",
+            DEFAULT_LAT: "__VITE_DEFAULT_LAT__",
+            DEFAULT_LNG: "__VITE_DEFAULT_LNG__",
+            APP_ENV: "__VITE_APP_ENV__"
+        };
+    </script>
     <div id="app">
         <header>
             <div class="header-center">
