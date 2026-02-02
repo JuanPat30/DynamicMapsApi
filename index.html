@@ -26,6 +26,19 @@
             flex-grow: 1;
             width: 100%;
             background: #e5e3df;
+            position: relative;
+        }
+        #loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: #137333;
+            z-index: 10;
+        }
+        .hidden {
+            display: none !important;
         }
         .error {
             display: flex;
@@ -42,7 +55,9 @@
         <header>
             <h1>Google Maps Dynamic Loader</h1>
         </header>
-        <div id="map"></div>
+        <div id="map">
+            <div id="loader">Cargando Mapa...</div>
+        </div>
     </div>
     <script type="module" src="/src/main.js"></script>
 </body>
