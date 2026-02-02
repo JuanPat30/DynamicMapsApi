@@ -12,22 +12,12 @@ class App {
         this.maps = new GoogleMapsAdapter(Config, this.logger);
         this.ui = {
             mapContainerId: 'map',
-            loaderId: 'loader',
-            themeToggleId: 'theme-toggle'
-        };
-        this.state = {
-            isDarkMode: false
+            loaderId: 'loader'
         };
     }
 
     async run() {
         const loader = document.getElementById(this.ui.loaderId);
-        const themeToggle = document.getElementById(this.ui.themeToggleId);
-
-        // Inicializar eventos de UI
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => this.toggleTheme());
-        }
         
         try {
             this.logger.info(`Iniciando Aplicación en modo: ${Config.app.env}`);
@@ -46,20 +36,6 @@ class App {
             this.logger.error("Error fatal durante el arranque", error);
             this.handleFatalError(error);
         }
-    }
-
-    toggleTheme() {
-        this.state.isDarkMode = !this.state.isDarkMode;
-        
-        // Actualizar UI Global
-        document.body.classList.toggle('dark-mode', this.state.isDarkMode);
-        const themeToggle = document.getElementById(this.ui.themeToggleId);
-        if (themeToggle) {
-            themeToggle.textContent = this.state.isDarkMode ? 'Modo Claro' : 'Modo Oscuro';
-        }
-
-        // Actualizar Mapa
-        this.maps.setDarkMode(this.state.isDarkMode);
     }
 
     handleFatalError(error) {
