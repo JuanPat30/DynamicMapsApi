@@ -12,6 +12,8 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
     ports:
       - "8080:8080"
+    volumes:
+      - "C:\\Users\\jpatino\\AppData\\Roaming\\gcloud\\application_default_credentials.json:/app/credentials/adc.json:ro"
     env_file:
       - .env
     restart: always
