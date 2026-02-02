@@ -1,0 +1,23 @@
+services:
+  maps-frontend:
+    build:
+      context: .
+      args:
+        # Pasamos las variables del host al proceso de build
+        - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
+        - VITE_GOOGLE_MAPS_MAP_ID=${VITE_GOOGLE_MAPS_MAP_ID}
+        - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - maps-net
+
+networks:
+  maps-net:
+    driver: bridge

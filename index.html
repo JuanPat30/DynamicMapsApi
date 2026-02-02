@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps - Hexagonal Architecture</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background: #137333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        #map {
+            flex-grow: 1;
+            width: 100%;
+            background: #e5e3df;
+        }
+        .error {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Google Maps Dynamic Loader</h1>
+        </header>
+        <div id="map"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
