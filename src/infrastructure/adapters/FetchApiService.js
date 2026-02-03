@@ -46,8 +46,15 @@ export class FetchApiService extends IApiService {
 
     async login(username, password) {
         this.logger.info(`Iniciando autenticación con usuario: ${username}`);
+        
+        // Generar credenciales Basic Auth para evitar el popup del navegador (ERR_401 Challenge)
+        const credentials = btoa(`${username}:${password}`);
+        
         const data = await this._request('/login', {
             method: 'POST',
+            headers: {
+                'Authorization': `Basic ${credentials}`
+            },
             body: JSON.stringify({ username, password })
         });
 

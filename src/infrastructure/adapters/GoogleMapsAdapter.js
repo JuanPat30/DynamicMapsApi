@@ -86,10 +86,52 @@ export class GoogleMapsAdapter {
                 content: pin.element
             });
 
-            this.logger.info(`Marcador agregado en Manhattan: ${location.lat}, ${location.lng}`);
+            this.logger.info(`Marcador agregado en: ${location.lat}, ${location.lng}`);
             return marker;
         } catch (e) {
             this.logger.error("Error agregando marcador", e);
         }
+    }
+
+    /**
+     * Mueve la cámara del mapa a una ubicación específica.
+     */
+    moveTo(location) {
+        if (!this.map) return;
+        
+        try {
+            // Asegurar que las coordenadas sean números (evitar strings del backend/form)
+            const pos = {
+                lat: parseFloat(location.lat),
+                lng: parseFloat(location.lng)
+            };
+
+            this.logger.info(`Moviendo mapa a: ${pos.lat}, ${pos.lng}`);
+            
+            // panTo es más suave (animado) que setCenter
+            this.map.panTo(pos);
+            
+        } catch (e) {
+            this.logger.error("Error al mover el mapa", e);
+        }
+    }
+
+    /**
+     * Registra un callback para cuando se hace click en el mapa.
+     */
+    onMapClick(callback) {
+        if (!this.map) {
+            this.logger.warn("No se puede registrar click: el mapa no se ha inicializado.");
+            return;
+        }
+
+        this.map.addListener("click", (e) => {
+            const coords = {
+                lat: e.latLng.lat(),
+                lng: e.latLng.lng()
+            };
+            this.logger.info("Click detectado en coordenadas:", coords);
+            callback(coords);
+        });
     }
 }

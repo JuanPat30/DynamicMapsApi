@@ -21,69 +21,39 @@
       console.log("APP_CONFIG cargado:", window.APP_CONFIG);
     </script>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-        }
-        #app {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        header {
-            background: #000000;
-            color: #ffffff;
-            padding: 1rem;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .header-center h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-        }
-        .test-badge {
-            font-size: 0.8rem;
-            background: #FBBC04;
-            color: #000;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 10px;
-            vertical-align: middle;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-        #map {
-            flex-grow: 1;
-            width: 100%;
-            background: #e5e3df;
-            position: relative;
-        }
-        #loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.2rem;
-            color: #137333;
-            z-index: 10;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .error {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            color: #d32f2f;
-            font-weight: bold;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a1a; color: white; overflow: hidden; }
+        #app { display: flex; flex-direction: column; height: 100vh; }
+        
+        header { background: #000000; color: #ffffff; padding: 0.8rem; text-align: center; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 100; }
+        .header-center h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; }
+        .test-badge { font-size: 0.7rem; background: #FBBC04; color: #000; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; text-transform: uppercase; font-weight: bold; }
+        
+        /* Layout Principal con Sidebar */
+        .main-container { display: flex; flex-grow: 1; width: 100%; overflow: hidden; position: relative; }
+        
+        /* Sidebar */
+        .sidebar { width: 350px; min-width: 350px; background: #222; border-right: 1px solid #444; padding: 20px; overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column; z-index: 50; }
+        .sidebar h2 { margin-top: 0; font-size: 1.1rem; color: #FBBC04; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        /* Mapa */
+        #map-wrapper { flex-grow: 1; position: relative; background: #1a1a1a; }
+        #map { height: 100%; width: 100%; }
+        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: #FBBC04; z-index: 60; }
+
+        /* Formulario y Controles */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: #aaa; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #444; background: #333; color: white; box-sizing: border-box; font-size: 0.9rem; }
+        .form-group input[type="checkbox"] { width: auto; cursor: pointer; }
+        
+        button#execute-btn { width: 100%; padding: 12px; background: #FBBC04; color: black; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; font-size: 0.9rem; }
+        button#execute-btn:hover { background: #fcc934; }
+        button#execute-btn:disabled { background: #555; cursor: not-allowed; }
+
+        #response-viewer { margin-top: 20px; background: #000; padding: 15px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.75rem; max-height: 300px; overflow-y: auto; border: 1px solid #333; color: #00ff00; white-space: pre-wrap; word-break: break-all; }
+        
+        .hidden { display: none !important; }
+        .error-msg { display: flex; justify-content: center; align-items: center; height: 100%; color: #d32f2f; font-weight: bold; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
@@ -93,8 +63,35 @@
                 <h1>Google Maps Dynamic Loader <span class="test-badge">Test API</span></h1>
             </div>
         </header>
-        <div id="map">
-            <div id="loader">Cargando Mapa...</div>
+
+        <div class="main-container">
+            <!-- Sidebar de Controles -->
+            <aside class="sidebar">
+                <h2>Control de Servicios</h2>
+                
+                <div class="form-group">
+                    <label for="service-selector">Seleccionar Servicio</label>
+                    <select id="service-selector">
+                        <option value="">-- Seleccione un servicio --</option>
+                    </select>
+                </div>
+                
+                <div id="dynamic-form">
+                    <p style="font-size: 0.85rem; color: #666; text-align: center; margin-top: 40px;">
+                        Seleccione un servicio para configurar los parámetros del request.
+                    </p>
+                </div>
+
+                <button id="execute-btn" disabled>Ejecutar Servicio</button>
+
+                <div id="response-viewer" class="hidden"></div>
+            </aside>
+
+            <!-- Área del Mapa -->
+            <main id="map-wrapper">
+                <div id="loader">Cargando Mapa...</div>
+                <div id="map"></div>
+            </main>
         </div>
     </div>
     <script type="module" src="/src/main.js"></script>
