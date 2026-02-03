@@ -46,7 +46,7 @@ class App {
             if (loader) loader.classList.add('hidden');
 
             // Lógica de negocio inicial: Marcador principal con info del backend
-            const markerTitle = enrichedData.display_name || "Sede Central";
+            const markerTitle = (enrichedData.data || enrichedData).formatted_address || "Sede Central";
             this.maps.addMarker(Config.defaultLocation, markerTitle);
             
             this.logger.info("Aplicación lista.");
@@ -109,6 +109,10 @@ class App {
                 input = document.createElement('input');
                 input.type = 'checkbox';
                 input.checked = param.default;
+            } else if (param.type === 'json') {
+                input = document.createElement('textarea');
+                input.className = 'json-input';
+                input.value = param.default || '';
             } else {
                 input = document.createElement('input');
                 input.type = param.type;
@@ -143,6 +147,12 @@ class App {
                 params[param.name] = input.checked;
             } else if (param.type === 'number') {
                 params[param.name] = parseFloat(input.value);
+            } else if (param.type === 'json') {
+                try {
+                    params[param.name] = JSON.parse(input.value);
+                } catch (e) {
+                    throw new Error(`JSON inválido en el campo ${param.label}`);
+                }
             } else {
                 params[param.name] = input.value;
             }
@@ -159,23 +169,33 @@ class App {
             let result;
             if (service.method === 'enrichLocation') {
                 result = await this.api.enrichLocation(params.latitude, params.longitude, params.generateMap);
+                const data = result.data || result;
+                if (data.latitude && data.longitude) {
+                    const pos = { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) };
+                    this.maps.addMarker(pos, data.formatted_address || "Resultado");
+                    this.maps.moveTo(pos);
+                }
             } else if (service.method === 'geocode') {
                 result = await this.api.geocode(params.address);
-            }
-
-            // Normalizar respuesta (el backend suele envolver en "data")
-            const locationData = result.data || result;
-            
-            if (locationData.latitude && locationData.longitude) {
-                const pos = { 
-                    lat: parseFloat(locationData.latitude), 
-                    lng: parseFloat(locationData.longitude) 
-                };
-                
-                const title = locationData.formatted_address || locationData.display_name || params.address || "Ubicación";
-                
-                this.maps.addMarker(pos, title);
-                this.maps.moveTo(pos);
+                const data = result.data || result;
+                if (data.latitude && data.longitude) {
+                    const pos = { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) };
+                    this.maps.addMarker(pos, data.formatted_address || params.address);
+                    this.maps.moveTo(pos);
+                }
+            } else if (service.method === 'cleanPath') {
+                const points = params.pointsJson;
+                result = await this.api.cleanPath(points);
+                const data = result.data || result;
+                if (data.snapped_path && data.snapped_path.length > 0) {
+                    // 1. Dibujar trazas
+                    this.maps.addPolyline(points, "#FF0000", 2); // Traza cruda
+                    this.maps.addPolyline(data.snapped_path, "#00FF00", 4); // Traza corregida
+                    
+                    // 2. Posicionar mapa en el primer punto corregido con zoom de detalle
+                    const firstPoint = data.snapped_path[0];
+                    this.maps.moveTo(firstPoint, 18);
+                }
             }
 
             this.ui.responseViewer.textContent = JSON.stringify(result, null, 2);
@@ -198,21 +218,17 @@ class App {
             this.logger.info("Mapa clickeado, consultando datos enriquecidos...");
             
             try {
-                // 1. Mostrar estado en el panel
                 this.ui.responseViewer.classList.remove('hidden');
                 this.ui.responseViewer.textContent = `Consultando ubicación: ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}...`;
                 this.ui.serviceSelector.value = 'enrichLocation';
                 this.renderServiceForm('enrichLocation');
                 
-                // 2. Ejecutar servicio de enriquecimiento
                 const result = await this.api.enrichLocation(coords.lat, coords.lng, false);
-                const locationData = result.data || result;
+                const data = result.data || result;
 
-                // 3. Mostrar resultados
                 this.ui.responseViewer.textContent = JSON.stringify(result, null, 2);
                 
-                // 4. Agregar marcador y centrar
-                const title = locationData.formatted_address || locationData.display_name || `Punto: ${coords.lat.toFixed(4)}`;
+                const title = data.formatted_address || data.display_name || `Punto: ${coords.lat.toFixed(4)}`;
                 this.maps.addMarker(coords, title);
                 this.maps.moveTo(coords);
 

@@ -16,6 +16,7 @@
         AUTH_PASSWORD: "__VITE_AUTH_PASSWORD__",
         DEFAULT_LAT: "__VITE_DEFAULT_LAT__",
         DEFAULT_LNG: "__VITE_DEFAULT_LNG__",
+        GENERATE_MAP: "__VITE_GENERATE_MAP__",
         APP_ENV: "__VITE_APP_ENV__"
       };
       console.log("APP_CONFIG cargado:", window.APP_CONFIG);
@@ -50,7 +51,35 @@
         button#execute-btn:hover { background: #fcc934; }
         button#execute-btn:disabled { background: #555; cursor: not-allowed; }
 
-        #response-viewer { margin-top: 20px; background: #000; padding: 15px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.75rem; max-height: 300px; overflow-y: auto; border: 1px solid #333; color: #00ff00; white-space: pre-wrap; word-break: break-all; }
+        .json-input, #response-viewer { 
+            background: #000; 
+            padding: 15px; 
+            border-radius: 4px; 
+            font-family: 'Consolas', monospace; 
+            font-size: 0.75rem; 
+            border: 1px solid #333; 
+            color: #00ff00; 
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .json-input {
+            height: 250px;
+            resize: none;
+            outline: none;
+        }
+
+        .json-input:focus {
+            border-color: #FBBC04;
+        }
+
+        #response-viewer { 
+            margin-top: 20px; 
+            max-height: 200px; 
+            overflow-y: auto; 
+            white-space: pre-wrap; 
+            word-break: break-all; 
+        }
         
         .hidden { display: none !important; }
         .error-msg { display: flex; justify-content: center; align-items: center; height: 100%; color: #d32f2f; font-weight: bold; text-align: center; padding: 20px; }

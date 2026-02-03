@@ -19,13 +19,16 @@ export class GoogleMapsAdapter {
                 version: "weekly",
             });
 
-            // Importación dinámica de librerías para mapa vectorial y marcadores
-            const [{ Map }, { AdvancedMarkerElement, PinElement }] = await Promise.all([
+            // Importación dinámica de librerías necesarias
+            const [
+                { Map, Polyline, LatLngBounds }, 
+                { AdvancedMarkerElement, PinElement }
+            ] = await Promise.all([
                 loader.importLibrary("maps"),
                 loader.importLibrary("marker")
             ]);
             
-            this.libraries = { Map, AdvancedMarkerElement, PinElement };
+            this.libraries = { Map, Polyline, LatLngBounds, AdvancedMarkerElement, PinElement };
             this.logger.info("Librerías de Google Maps cargadas correctamente.");
             
         } catch (e) {
@@ -96,7 +99,7 @@ export class GoogleMapsAdapter {
     /**
      * Mueve la cámara del mapa a una ubicación específica.
      */
-    moveTo(location) {
+    moveTo(location, zoom = null) {
         if (!this.map) return;
         
         try {
@@ -106,10 +109,15 @@ export class GoogleMapsAdapter {
                 lng: parseFloat(location.lng)
             };
 
-            this.logger.info(`Moviendo mapa a: ${pos.lat}, ${pos.lng}`);
+            this.logger.info(`Moviendo mapa a: ${pos.lat}, ${pos.lng} ${zoom ? `con zoom: ${zoom}` : ''}`);
             
             // panTo es más suave (animado) que setCenter
             this.map.panTo(pos);
+            
+            // Ajustar zoom si se proporciona
+            if (zoom !== null) {
+                this.map.setZoom(zoom);
+            }
             
         } catch (e) {
             this.logger.error("Error al mover el mapa", e);
@@ -133,5 +141,44 @@ export class GoogleMapsAdapter {
             this.logger.info("Click detectado en coordenadas:", coords);
             callback(coords);
         });
+    }
+
+    /**
+     * Dibuja una línea en el mapa.
+     */
+    addPolyline(path, color = "#FF0000", weight = 3) {
+        if (!this.map) return;
+        
+        try {
+            const polyline = new this.libraries.Polyline({
+                path: path,
+                geodesic: true,
+                strokeColor: color,
+                strokeOpacity: 1.0,
+                strokeWeight: weight,
+                map: this.map
+            });
+            
+            this.logger.info(`Línea agregada con ${path.length} puntos.`);
+            return polyline;
+        } catch (e) {
+            this.logger.error("Error al agregar línea", e);
+        }
+    }
+
+    /**
+     * Ajusta la vista para mostrar todos los puntos proporcionados.
+     */
+    fitBounds(points) {
+        if (!this.map || !points || points.length === 0) return;
+
+        try {
+            const bounds = new this.libraries.LatLngBounds();
+            points.forEach(p => bounds.extend(p));
+            this.map.fitBounds(bounds);
+            this.logger.info("Mapa ajustado a los límites de la traza.");
+        } catch (e) {
+            this.logger.error("Error al ajustar límites", e);
+        }
     }
 }

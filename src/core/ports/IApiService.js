@@ -24,5 +24,10 @@ export class IApiService {
         throw new Error("Método geocode() no implementado");
     }
 
-    // Otros métodos de la colección Postman se añadirán según sea necesario...
+    /**
+     * Corrección de Traza: Ajusta puntos a la vía.
+     */
+    async cleanPath(points, generateMap = false) {
+        throw new Error("Método cleanPath() no implementado");
+    }
 }

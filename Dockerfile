@@ -29,6 +29,7 @@ ENV VITE_AUTH_USERNAME="admin"
 ENV VITE_AUTH_PASSWORD="admin"
 ENV VITE_DEFAULT_LAT="40.7484"
 ENV VITE_DEFAULT_LNG="-73.9857"
+ENV VITE_GENERATE_MAP="false"
 ENV VITE_APP_ENV="production"
 
 # El comando de inicio:
@@ -43,6 +44,7 @@ CMD ["sh", "-c", "\
     sed -i \"s|__VITE_AUTH_PASSWORD__|${VITE_AUTH_PASSWORD}|g\" index.html && \
     sed -i \"s|__VITE_DEFAULT_LAT__|${VITE_DEFAULT_LAT}|g\" index.html && \
     sed -i \"s|__VITE_DEFAULT_LNG__|${VITE_DEFAULT_LNG}|g\" index.html && \
+    sed -i \"s|__VITE_GENERATE_MAP__|${VITE_GENERATE_MAP}|g\" index.html && \
     sed -i \"s|__VITE_APP_ENV__|${VITE_APP_ENV}|g\" index.html && \
     envsubst '${PORT}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && \
     nginx -g 'daemon off;' \

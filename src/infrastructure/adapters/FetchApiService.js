@@ -80,4 +80,11 @@ export class FetchApiService extends IApiService {
             body: JSON.stringify({ address })
         });
     }
+
+    async cleanPath(points, generateMap = false) {
+        return await this._request('/clean-path', {
+            method: 'POST',
+            body: JSON.stringify({ points, generate_map: generateMap })
+        });
+    }
 }

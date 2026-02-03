@@ -22,5 +22,19 @@ export const ServiceRegistry = [
         params: [
             { name: 'address', label: 'Dirección', type: 'text', default: 'Empire State Building', placeholder: 'Ej: Calle 100 # 15-20, Bogotá' }
         ]
+    },
+    {
+        id: 'cleanPath',
+        name: 'Corrección de Traza',
+        method: 'cleanPath',
+        description: 'Ajusta una serie de puntos a las vías existentes.',
+        params: [
+            { 
+                name: 'pointsJson', 
+                label: 'Puntos (JSON)', 
+                type: 'json', 
+                default: '[\n  {"lat": 6.2442, "lng": -75.5812, "timestamp": "2023-10-27T10:00:00Z"},\n  {"lat": 6.2445, "lng": -75.5815, "timestamp": "2023-10-27T10:00:10Z"}\n]' 
+            }
+        ]
     }
 ];
