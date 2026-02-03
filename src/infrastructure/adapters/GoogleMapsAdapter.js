@@ -43,18 +43,22 @@ export class GoogleMapsAdapter {
 
             this.map = new this.libraries.Map(element, {
                 center: this.config.defaultLocation,
-                zoom: 18,
+                zoom: 19, // Un poco más cerca para resaltar el 3D
                 mapId: this.config.mapId,
+                mapTypeId: 'hybrid', // Iniciamos en híbrido para verificar el 3D
                 mapTypeControl: true,
                 mapTypeControlOptions: {
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
                     position: google.maps.ControlPosition.TOP_LEFT,
+                    mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain']
                 },
-                // Perspectiva 3D
-                tilt: 45,
-                heading: 0,
+                // Perspectiva 3D agresiva para resaltar el eje Z
+                tilt: 67.5, 
+                heading: 45,
                 rotateControl: true,
                 tiltControl: true,
+                // Garantizar que el motor vectorial esté activo
+                renderingType: 'VECTOR' 
             });
 
             this.logger.info("Mapa vectorial renderizado con soporte 3D.");

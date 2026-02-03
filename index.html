@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Maps - Hexagonal Architecture</title>
+    <script>
+      // Placeholder para inyección de variables en runtime (Cloud Run)
+      // Se coloca al inicio del head para asegurar disponibilidad inmediata
+      window.APP_CONFIG = {
+        API_KEY: "__VITE_GOOGLE_MAPS_API_KEY__",
+        MAP_ID: "__VITE_GOOGLE_MAPS_MAP_ID__",
+        BACKEND_URL: "__VITE_BACKEND_URL__",
+        API_V1_PATH: "__VITE_API_V1_PATH__",
+        AUTH_USERNAME: "__VITE_AUTH_USERNAME__",
+        AUTH_PASSWORD: "__VITE_AUTH_PASSWORD__",
+        DEFAULT_LAT: "__VITE_DEFAULT_LAT__",
+        DEFAULT_LNG: "__VITE_DEFAULT_LNG__",
+        APP_ENV: "__VITE_APP_ENV__"
+      };
+      console.log("APP_CONFIG cargado:", window.APP_CONFIG);
+    </script>
     <style>
         body, html {
             margin: 0;
@@ -71,16 +87,6 @@
     </style>
 </head>
 <body>
-    <script>
-        // Placeholder para inyección de variables de entorno en runtime
-        window.APP_CONFIG = {
-            API_KEY: "__VITE_GOOGLE_MAPS_API_KEY__",
-            MAP_ID: "__VITE_GOOGLE_MAPS_MAP_ID__",
-            DEFAULT_LAT: "__VITE_DEFAULT_LAT__",
-            DEFAULT_LNG: "__VITE_DEFAULT_LNG__",
-            APP_ENV: "__VITE_APP_ENV__"
-        };
-    </script>
     <div id="app">
         <header>
             <div class="header-center">

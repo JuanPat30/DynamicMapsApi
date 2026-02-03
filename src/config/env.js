@@ -25,6 +25,15 @@ const getEnv = (key, placeholder) => {
 export const Config = {
     apiKey: getEnv('API_KEY', '__VITE_GOOGLE_MAPS_API_KEY__'),
     mapId: getEnv('MAP_ID', '__VITE_GOOGLE_MAPS_MAP_ID__'),
+    backend: {
+        baseUrl: getEnv('BACKEND_URL', '__VITE_BACKEND_URL__') || 'http://localhost:8080',
+        apiV1Path: getEnv('API_V1_PATH', '__VITE_API_V1_PATH__') || '/api/v1',
+        generateMap: (getEnv('GENERATE_MAP', '__VITE_GENERATE_MAP__') || 'false') === 'true',
+        auth: {
+            username: getEnv('AUTH_USERNAME', '__VITE_AUTH_USERNAME__') || 'admin',
+            password: getEnv('AUTH_PASSWORD', '__VITE_AUTH_PASSWORD__') || 'admin',
+        }
+    },
     defaultLocation: {
         lat: parseFloat(getEnv('DEFAULT_LAT', '__VITE_DEFAULT_LAT__') || '40.7484'),
         lng: parseFloat(getEnv('DEFAULT_LNG', '__VITE_DEFAULT_LNG__') || '-73.9857'),
