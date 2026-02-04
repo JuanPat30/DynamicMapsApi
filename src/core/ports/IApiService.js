@@ -30,4 +30,11 @@ export class IApiService {
     async cleanPath(points, generateMap = false) {
         throw new Error("Método cleanPath() no implementado");
     }
+
+    /**
+     * Auditoría de Ruta: Obtiene métricas y polilínea optimizada.
+     */
+    async auditRoute(data) {
+        throw new Error("Método auditRoute() no implementado");
+    }
 }

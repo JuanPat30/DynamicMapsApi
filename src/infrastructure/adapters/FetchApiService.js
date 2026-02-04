@@ -87,4 +87,11 @@ export class FetchApiService extends IApiService {
             body: JSON.stringify({ points, generate_map: generateMap })
         });
     }
+
+    async auditRoute(data) {
+        return await this._request('/audit-route', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
 }

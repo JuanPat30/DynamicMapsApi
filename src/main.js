@@ -188,13 +188,42 @@ class App {
                 result = await this.api.cleanPath(points);
                 const data = result.data || result;
                 if (data.snapped_path && data.snapped_path.length > 0) {
-                    // 1. Dibujar trazas
-                    this.maps.addPolyline(points, "#FF0000", 2); // Traza cruda
-                    this.maps.addPolyline(data.snapped_path, "#00FF00", 4); // Traza corregida
-                    
-                    // 2. Posicionar mapa en el primer punto corregido con zoom de detalle
+                    this.maps.addPolyline(points, "#FF0000", 2);
+                    this.maps.addPolyline(data.snapped_path, "#00FF00", 4);
                     const firstPoint = data.snapped_path[0];
                     this.maps.moveTo(firstPoint, 18);
+                }
+            } else if (service.method === 'auditRoute') {
+                const routeData = params.routeJson;
+                result = await this.api.auditRoute(routeData);
+                const data = result.data || result;
+
+                if (data.polyline) {
+                    const polyline = this.maps.addEncodedPolyline(data.polyline, "#0000FF", 5);
+                    if (polyline) {
+                        const pathArray = polyline.getPath().getArray();
+                        
+                        // Enviar cámara al inicio de la ruta auditada
+                        if (pathArray.length > 0) {
+                            this.maps.moveTo(pathArray[0], 17);
+                        }
+
+                        // Marcar Waypoints
+                        if (routeData.waypoints && Array.isArray(routeData.waypoints)) {
+                            routeData.waypoints.forEach(async (wp) => {
+                                try {
+                                    const geoResult = await this.api.geocode(wp);
+                                    const geoData = geoResult.data || geoResult;
+                                    if (geoData.latitude && geoData.longitude) {
+                                        const pos = { lat: parseFloat(geoData.latitude), lng: parseFloat(geoData.longitude) };
+                                        this.maps.addMarker(pos, `WP: ${wp}`);
+                                    }
+                                } catch (e) {
+                                    this.logger.warn(`Fallo geocode WP: ${wp}`);
+                                }
+                            });
+                        }
+                    }
                 }
             }
 
@@ -230,7 +259,7 @@ class App {
                 
                 const title = data.formatted_address || data.display_name || `Punto: ${coords.lat.toFixed(4)}`;
                 this.maps.addMarker(coords, title);
-                this.maps.moveTo(coords);
+                this.maps.moveTo(coords, 18); // Añadido zoom en click también
 
             } catch (error) {
                 this.logger.error("Error al enriquecer punto clickeado", error);

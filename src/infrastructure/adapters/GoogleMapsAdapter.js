@@ -22,13 +22,15 @@ export class GoogleMapsAdapter {
             // Importación dinámica de librerías necesarias
             const [
                 { Map, Polyline, LatLngBounds }, 
-                { AdvancedMarkerElement, PinElement }
+                { AdvancedMarkerElement, PinElement },
+                geometry
             ] = await Promise.all([
                 loader.importLibrary("maps"),
-                loader.importLibrary("marker")
+                loader.importLibrary("marker"),
+                loader.importLibrary("geometry")
             ]);
             
-            this.libraries = { Map, Polyline, LatLngBounds, AdvancedMarkerElement, PinElement };
+            this.libraries = { Map, Polyline, LatLngBounds, AdvancedMarkerElement, PinElement, geometry };
             this.logger.info("Librerías de Google Maps cargadas correctamente.");
             
         } catch (e) {
@@ -98,16 +100,28 @@ export class GoogleMapsAdapter {
 
     /**
      * Mueve la cámara del mapa a una ubicación específica.
+     * Soporta tanto {lat, lng} simple como objetos google.maps.LatLng nativos.
      */
     moveTo(location, zoom = null) {
         if (!this.map) return;
         
         try {
-            // Asegurar que las coordenadas sean números (evitar strings del backend/form)
-            const pos = {
-                lat: parseFloat(location.lat),
-                lng: parseFloat(location.lng)
-            };
+            let lat, lng;
+
+            // Detectar si es un objeto LatLng nativo (usa funciones lat() / lng())
+            if (typeof location.lat === 'function') {
+                lat = location.lat();
+                lng = location.lng();
+            } else {
+                lat = parseFloat(location.lat);
+                lng = parseFloat(location.lng);
+            }
+
+            if (isNaN(lat) || isNaN(lng)) {
+                throw new Error("Coordenadas inválidas para mover el mapa");
+            }
+
+            const pos = { lat, lng };
 
             this.logger.info(`Moviendo mapa a: ${pos.lat}, ${pos.lng} ${zoom ? `con zoom: ${zoom}` : ''}`);
             
@@ -163,6 +177,21 @@ export class GoogleMapsAdapter {
             return polyline;
         } catch (e) {
             this.logger.error("Error al agregar línea", e);
+        }
+    }
+
+    /**
+     * Decodifica una polilínea y la dibuja en el mapa.
+     */
+    addEncodedPolyline(encodedPath, color = "#0000FF", weight = 4) {
+        if (!this.map || !this.libraries.geometry) return;
+
+        try {
+            const path = google.maps.geometry.encoding.decodePath(encodedPath);
+            this.logger.info(`Polilínea decodificada: ${path.length} puntos.`);
+            return this.addPolyline(path, color, weight);
+        } catch (e) {
+            this.logger.error("Error al decodificar polilínea", e);
         }
     }
 

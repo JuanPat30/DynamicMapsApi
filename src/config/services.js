@@ -36,5 +36,19 @@ export const ServiceRegistry = [
                 default: '[\n  {"lat": 6.2442, "lng": -75.5812, "timestamp": "2023-10-27T10:00:00Z"},\n  {"lat": 6.2445, "lng": -75.5815, "timestamp": "2023-10-27T10:00:10Z"}\n]' 
             }
         ]
+    },
+    {
+        id: 'auditRoute',
+        name: 'Auditoría de Ruta',
+        method: 'auditRoute',
+        description: 'Obtiene métricas y polilínea optimizada entre origen y destino.',
+        params: [
+            { 
+                name: 'routeJson', 
+                label: 'Configuración de Ruta (JSON)', 
+                type: 'json', 
+                default: '{\n  "origin": "Parque Berrio, Medellin",\n  "destination": "Terminal del Norte, Medellin",\n  "waypoints": ["Centro Comercial Premium Plaza"],\n  "generate_map": false\n}' 
+            }
+        ]
     }
 ];
