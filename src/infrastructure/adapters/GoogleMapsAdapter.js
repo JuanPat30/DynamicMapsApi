@@ -7,6 +7,9 @@ export class GoogleMapsAdapter {
         this.config = config;
         this.logger = logger;
         this.map = null;
+        this.libraries = null;
+        this.markers = [];
+        this.polylines = [];
     }
 
     async load() {
@@ -91,6 +94,7 @@ export class GoogleMapsAdapter {
                 content: pin.element
             });
 
+            this.markers.push(marker); // Guardar referencia para limpieza
             this.logger.info(`Marcador agregado en: ${location.lat}, ${location.lng}`);
             return marker;
         } catch (e) {
@@ -173,6 +177,7 @@ export class GoogleMapsAdapter {
                 map: this.map
             });
             
+            this.polylines.push(polyline); // Guardar referencia para limpieza
             this.logger.info(`Línea agregada con ${path.length} puntos.`);
             return polyline;
         } catch (e) {
@@ -209,5 +214,20 @@ export class GoogleMapsAdapter {
         } catch (e) {
             this.logger.error("Error al ajustar límites", e);
         }
+    }
+
+    /**
+     * Limpia todos los elementos dibujados en el mapa.
+     */
+    clearMap() {
+        this.logger.info("Limpiando elementos del mapa...");
+        
+        // 1. Eliminar marcadores
+        this.markers.forEach(m => m.map = null);
+        this.markers = [];
+        
+        // 2. Eliminar líneas
+        this.polylines.forEach(p => p.setMap(null));
+        this.polylines = [];
     }
 }

@@ -50,5 +50,19 @@ export const ServiceRegistry = [
                 default: '{\n  "origin": "Parque Berrio, Medellin",\n  "destination": "Terminal del Norte, Medellin",\n  "waypoints": ["Centro Comercial Premium Plaza"],\n  "generate_map": false\n}' 
             }
         ]
+    },
+    {
+        id: 'placesTextSearch',
+        name: 'Búsqueda de Lugares',
+        method: 'searchPlaces',
+        description: 'Busca múltiples lugares basados en una consulta de texto.',
+        params: [
+            { 
+                name: 'searchJson', 
+                label: 'Consulta (JSON)', 
+                type: 'json', 
+                default: '{\n  "textQuery": "Tiendas de venta de vinylos en medellin"\n}' 
+            }
+        ]
     }
 ];

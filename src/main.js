@@ -161,6 +161,10 @@ class App {
         try {
             this.ui.executeBtn.disabled = true;
             this.ui.executeBtn.textContent = 'Ejecutando...';
+            
+            // Limpiar mapa antes de procesar nuevos resultados
+            this.maps.clearMap();
+
             this.ui.responseViewer.classList.remove('hidden');
             this.ui.responseViewer.textContent = 'Enviando petición...';
 
@@ -202,13 +206,10 @@ class App {
                     const polyline = this.maps.addEncodedPolyline(data.polyline, "#0000FF", 5);
                     if (polyline) {
                         const pathArray = polyline.getPath().getArray();
-                        
-                        // Enviar cámara al inicio de la ruta auditada
                         if (pathArray.length > 0) {
                             this.maps.moveTo(pathArray[0], 17);
                         }
 
-                        // Marcar Waypoints
                         if (routeData.waypoints && Array.isArray(routeData.waypoints)) {
                             routeData.waypoints.forEach(async (wp) => {
                                 try {
@@ -223,6 +224,30 @@ class App {
                                 }
                             });
                         }
+                    }
+                }
+            } else if (service.method === 'searchPlaces') {
+                const searchData = params.searchJson;
+                result = await this.api.searchPlaces(searchData);
+                const data = result.data || result;
+
+                if (data.places && Array.isArray(data.places)) {
+                    const locations = [];
+                    data.places.forEach(place => {
+                        if (place.location) {
+                            const pos = { 
+                                lat: parseFloat(place.location.latitude), 
+                                lng: parseFloat(place.location.longitude) 
+                            };
+                            const title = place.displayName?.text || place.formattedAddress || "Lugar Encontrado";
+                            this.maps.addMarker(pos, title);
+                            locations.push(pos);
+                        }
+                    });
+
+                    if (locations.length > 0) {
+                        // Desplazar mapa al primer resultado encontrado
+                        this.maps.moveTo(locations[0], 17);
                     }
                 }
             }
@@ -259,7 +284,7 @@ class App {
                 
                 const title = data.formatted_address || data.display_name || `Punto: ${coords.lat.toFixed(4)}`;
                 this.maps.addMarker(coords, title);
-                this.maps.moveTo(coords, 18); // Añadido zoom en click también
+                this.maps.moveTo(coords, 18);
 
             } catch (error) {
                 this.logger.error("Error al enriquecer punto clickeado", error);

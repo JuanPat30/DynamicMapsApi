@@ -37,4 +37,11 @@ export class IApiService {
     async auditRoute(data) {
         throw new Error("Método auditRoute() no implementado");
     }
+
+    /**
+     * Búsqueda de Lugares: Encuentra lugares basados en texto.
+     */
+    async searchPlaces(data) {
+        throw new Error("Método searchPlaces() no implementado");
+    }
 }

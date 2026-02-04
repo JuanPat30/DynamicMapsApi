@@ -94,4 +94,11 @@ export class FetchApiService extends IApiService {
             body: JSON.stringify(data)
         });
     }
+
+    async searchPlaces(data) {
+        return await this._request('/places/text-search', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
 }
