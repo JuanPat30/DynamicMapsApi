@@ -44,4 +44,11 @@ export class IApiService {
     async searchPlaces(data) {
         throw new Error("Método searchPlaces() no implementado");
     }
+
+    /**
+     * Direcciones: Obtiene rutas entre dos puntos.
+     */
+    async getDirections(data) {
+        throw new Error("Método getDirections() no implementado");
+    }
 }

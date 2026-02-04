@@ -64,5 +64,19 @@ export const ServiceRegistry = [
                 default: '{\n  "textQuery": "Tiendas de venta de vinylos en medellin"\n}' 
             }
         ]
+    },
+    {
+        id: 'directions',
+        name: 'Obtener Direcciones',
+        method: 'getDirections',
+        description: 'Calcula rutas entre origen y destino.',
+        params: [
+            { 
+                name: 'directionsJson', 
+                label: 'Configuración de Ruta (JSON)', 
+                type: 'json', 
+                default: '{\n  "origin": "Disneyland",\n  "destination": "Universal Studios Hollywood",\n  "mode": "walking",\n  "generate_map": false\n}' 
+            }
+        ]
     }
 ];

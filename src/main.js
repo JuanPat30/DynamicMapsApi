@@ -246,8 +246,29 @@ class App {
                     });
 
                     if (locations.length > 0) {
-                        // Desplazar mapa al primer resultado encontrado
                         this.maps.moveTo(locations[0], 17);
+                    }
+                }
+            } else if (service.method === 'getDirections') {
+                const directionsData = params.directionsJson;
+                result = await this.api.getDirections(directionsData);
+                const data = result.data || result;
+
+                if (data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    if (route.overview_polyline && route.overview_polyline.points) {
+                        // 1. Dibujar ruta (NARANJA)
+                        this.maps.addEncodedPolyline(route.overview_polyline.points, "#FF8C00", 6);
+                        
+                        // 2. Marcar Inicio y Fin
+                        if (route.legs && route.legs.length > 0) {
+                            const leg = route.legs[0];
+                            this.maps.addMarker(leg.start_location, "INICIO: " + leg.start_address);
+                            this.maps.addMarker(leg.end_location, "FIN: " + leg.end_address);
+                            
+                            // 3. Enfocar Inicio
+                            this.maps.moveTo(leg.start_location, 16);
+                        }
                     }
                 }
             }

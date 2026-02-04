@@ -101,4 +101,11 @@ export class FetchApiService extends IApiService {
             body: JSON.stringify(data)
         });
     }
+
+    async getDirections(data) {
+        return await this._request('/directions', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
 }
