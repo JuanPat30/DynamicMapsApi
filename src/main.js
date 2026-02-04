@@ -257,19 +257,54 @@ class App {
                 if (data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
                     if (route.overview_polyline && route.overview_polyline.points) {
-                        // 1. Dibujar ruta (NARANJA)
                         this.maps.addEncodedPolyline(route.overview_polyline.points, "#FF8C00", 6);
-                        
-                        // 2. Marcar Inicio y Fin
                         if (route.legs && route.legs.length > 0) {
                             const leg = route.legs[0];
                             this.maps.addMarker(leg.start_location, "INICIO: " + leg.start_address);
                             this.maps.addMarker(leg.end_location, "FIN: " + leg.end_address);
-                            
-                            // 3. Enfocar Inicio
                             this.maps.moveTo(leg.start_location, 16);
                         }
                     }
+                }
+            } else if (service.method === 'getDistanceMatrix') {
+                const matrixData = params.matrixJson;
+                result = await this.api.getDistanceMatrix(matrixData);
+                const data = result.data || result;
+
+                const allPoints = [];
+                
+                // Procesar Orígenes
+                if (data.origin_addresses) {
+                    for (const addr of data.origin_addresses) {
+                        try {
+                            const geo = await this.api.geocode(addr);
+                            const gData = geo.data || geo;
+                            if (gData.latitude && gData.longitude) {
+                                const pos = { lat: parseFloat(gData.latitude), lng: parseFloat(gData.longitude) };
+                                this.maps.addMarker(pos, `ORIGEN: ${addr}`);
+                                allPoints.push(pos);
+                            }
+                        } catch (e) { this.logger.warn(`Fallo geocode origen: ${addr}`); }
+                    }
+                }
+
+                // Procesar Destinos
+                if (data.destination_addresses) {
+                    for (const addr of data.destination_addresses) {
+                        try {
+                            const geo = await this.api.geocode(addr);
+                            const gData = geo.data || geo;
+                            if (gData.latitude && gData.longitude) {
+                                const pos = { lat: parseFloat(gData.latitude), lng: parseFloat(gData.longitude) };
+                                this.maps.addMarker(pos, `DESTINO: ${addr}`);
+                                allPoints.push(pos);
+                            }
+                        } catch (e) { this.logger.warn(`Fallo geocode destino: ${addr}`); }
+                    }
+                }
+
+                if (allPoints.length > 0) {
+                    this.maps.fitBounds(allPoints);
                 }
             }
 

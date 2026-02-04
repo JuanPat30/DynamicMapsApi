@@ -51,4 +51,11 @@ export class IApiService {
     async getDirections(data) {
         throw new Error("Método getDirections() no implementado");
     }
+
+    /**
+     * Matriz de Distancia: Calcula tiempos y distancias NxM.
+     */
+    async getDistanceMatrix(data) {
+        throw new Error("Método getDistanceMatrix() no implementado");
+    }
 }

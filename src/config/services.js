@@ -78,5 +78,19 @@ export const ServiceRegistry = [
                 default: '{\n  "origin": "Disneyland",\n  "destination": "Universal Studios Hollywood",\n  "mode": "walking",\n  "generate_map": false\n}' 
             }
         ]
+    },
+    {
+        id: 'distanceMatrix',
+        name: 'Matriz de Distancia',
+        method: 'getDistanceMatrix',
+        description: 'Calcula tiempos y distancias entre múltiples puntos.',
+        params: [
+            { 
+                name: 'matrixJson', 
+                label: 'Configuración de Matriz (JSON)', 
+                type: 'json', 
+                default: '{\n  "origins": ["Washington, DC", "New York, NY"],\n  "destinations": ["Los Angeles, CA", "Miami, FL"],\n  "units": "imperial"\n}' 
+            }
+        ]
     }
 ];

@@ -108,4 +108,11 @@ export class FetchApiService extends IApiService {
             body: JSON.stringify(data)
         });
     }
+
+    async getDistanceMatrix(data) {
+        return await this._request('/distance-matrix', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
 }
